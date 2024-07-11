@@ -1,9 +1,6 @@
 package com.srg.ebankspring.controller;
 
-import com.srg.ebankspring.model.dto.AccountDTO;
 import com.srg.ebankspring.model.dto.TransferDTO;
-import com.srg.ebankspring.repository.TransferRepository;
-import com.srg.ebankspring.service.AccountService;
 import com.srg.ebankspring.service.TransferService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +15,7 @@ public class TransferController {
     @Autowired
     private TransferService transferService;
 
-    @Autowired
-    private TransferRepository transferRepository;
-
-    @GetMapping
+    @GetMapping("/AllTransfer")
     public ResponseEntity<List<TransferDTO>> getAccount() {
         return ResponseEntity.ok(transferService.GetAllTransfer());
     }
