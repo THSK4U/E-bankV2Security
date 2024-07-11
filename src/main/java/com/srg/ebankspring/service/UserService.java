@@ -36,5 +36,4 @@ public class UserService implements IUserService {
         List<User> users = userRepository.findAll();
         return userMapper.toDTOList(users);
     }
-
 }
