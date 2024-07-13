@@ -1,5 +1,7 @@
 package com.srg.ebankspring.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.srg.ebankspring.model.Enum.EnumRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,6 +29,11 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private EnumRole role;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnoreProperties()
+    private List<Account> accounts;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

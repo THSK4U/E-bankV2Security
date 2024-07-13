@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,6 +18,13 @@ public class Transfer {
     private Long transferId;
     private Double amount;
     private String description;
+    @Column(updatable = false)
+    private LocalDateTime TransferTime;
+    @PrePersist
+    protected void onCreate() {
+
+        TransferTime = LocalDateTime.now();
+    }
 
     @ManyToOne
     @JoinColumn(name = "sourceaccountId", nullable = false)

@@ -1,6 +1,7 @@
 package com.srg.ebankspring.model.mapper;
 
 import com.srg.ebankspring.model.dto.TransferDTO;
+import com.srg.ebankspring.model.entity.Account;
 import com.srg.ebankspring.model.entity.Transfer;
 import org.mapstruct.Mapper;
 
