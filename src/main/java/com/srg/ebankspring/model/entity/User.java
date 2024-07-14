@@ -11,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -33,6 +34,11 @@ public class User implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL)
     @JsonIgnoreProperties()
     private List<Account> accounts;
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 
 
     @Override

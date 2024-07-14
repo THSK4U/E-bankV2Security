@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,7 +26,10 @@ import java.io.IOException;
 @AllArgsConstructor
 public class LoginFilter extends OncePerRequestFilter {
 
+    @Autowired
     private final JwtService jwtService;
+
+    @Autowired
     private final UserDetailsService userDetailsService;
 
     @Override
@@ -35,38 +39,39 @@ public class LoginFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-
         String authorization = request.getHeader("Authorization");
 
-        if (authorization != null || authorization.startsWith("Bearer ")) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
+
         String token = authorization.substring("Bearer ".length());
         String username = jwtService.extractUsername(token);
-         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-             // Validate the token
-             if (jwtService.isTokenValid(token, userDetails)) {
+            // Validate the token
+            if (jwtService.isTokenValid(token, userDetails)) {
+                // Create authentication token
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities()
+                );
 
-                 // Create authentication token
-                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                         userDetails, null, userDetails.getAuthorities()
-                 );
+                // Set authentication details
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                 // authentication details
-                 authToken.setDetails(
-                         new WebAuthenticationDetailsSource().buildDetails(request)
-                 );
+                // Set authentication in security context
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
 
-                 SecurityContextHolder.getContext().setAuthentication(authToken);
-             }
-         }
-        System.out.println("path :" + request.getRequestURI());
-        System.out.println("path Servlet :" + request.getServletPath());
+        // Log path details (optional)
+        System.out.println("Path: " + request.getRequestURI());
+        System.out.println("Servlet Path: " + request.getServletPath());
+
+        // Continue filter chain
         filterChain.doFilter(request, response);
-
     }
 }
