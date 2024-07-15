@@ -28,38 +28,38 @@ public class SecurityConfig {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
     @Autowired
     private LoginFilter loginFilter;
 
     @Bean
-    public SecurityFilterChain SecurityFilterChain(HttpSecurity http) throws Exception {
-            //allows page
-          //  authRequest.requestMatchers("/").permitAll();
-            //Authentication page
-           // authRequest.requestMatchers("/api/**").hasRole("ADMIN");
-           // authRequest.requestMatchers("/api/Transfer","/api/Transfer/AllTransfer").authenticated();
-;
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        //allows page
+        //  authRequest.requestMatchers("/").permitAll();
+        //Authentication page
+        // authRequest.requestMatchers("/api/**").hasRole("ADMIN");
+        // authRequest.requestMatchers("/api/Transfer","/api/Transfer/AllTransfer").authenticated();
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(
-                        req->req.requestMatchers("/login/**","/register/**", "/refresh_token/**")
-                                .permitAll()
-                                .requestMatchers("/admin_only/**").hasAuthority("ADMIN")
-                                .anyRequest()
-                                .authenticated()
-                ).userDetailsService(userDetailsService)
-                .sessionManagement(session->session
+                .authorizeHttpRequests(req -> req
+                        .requestMatchers("/login/**", "/register/**", "/refresh_token/**")
+                        .permitAll()
+                        .requestMatchers("/api/**").hasAuthority("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
-}
-
+    }
 }

@@ -23,6 +23,10 @@ public class AuthenticationService {
     private AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(UserDTO request) {
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+            throw new RuntimeException("Username Déja");
+        }
+
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -33,7 +37,7 @@ public class AuthenticationService {
 
         String token = jwtService.generateToken(user);
 
-return new AuthenticationResponse(token);
+        return new AuthenticationResponse(token);
     }
 
     public AuthenticationResponse authenticate(UserDTO request) {
@@ -42,9 +46,11 @@ return new AuthenticationResponse(token);
                         request.getUsername(),
                         request.getPassword()));
 
-        User user = userRepository.findByUsername(request.getUsername()).orElseThrow();
-    String token = jwtService.generateToken(user);
-return new AuthenticationResponse(token);
-    }
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        String token = jwtService.generateToken(user);
 
+
+        return new AuthenticationResponse(token);
+    }
 }

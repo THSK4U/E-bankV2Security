@@ -26,10 +26,7 @@ import java.io.IOException;
 @AllArgsConstructor
 public class LoginFilter extends OncePerRequestFilter {
 
-    @Autowired
     private final JwtService jwtService;
-
-    @Autowired
     private final UserDetailsService userDetailsService;
 
     @Override
@@ -41,6 +38,7 @@ public class LoginFilter extends OncePerRequestFilter {
 
         String authorization = request.getHeader("Authorization");
 
+
         if (authorization == null || !authorization.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -48,6 +46,7 @@ public class LoginFilter extends OncePerRequestFilter {
 
         String token = authorization.substring("Bearer ".length());
         String username = jwtService.extractUsername(token);
+
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -67,7 +66,7 @@ public class LoginFilter extends OncePerRequestFilter {
             }
         }
 
-        // Log path details (optional)
+        // Log path
         System.out.println("Path: " + request.getRequestURI());
         System.out.println("Servlet Path: " + request.getServletPath());
 
